@@ -12,7 +12,7 @@ def load_animals():
 
 
 def build_animals_html(animals: list[dict]) -> str:
-    """Serialize each animal as an <li class='cards__item'>...</li> block."""
+    """Serialize each animal as a styled card <li>."""
     output = ""
 
     for animal in animals:
@@ -25,12 +25,14 @@ def build_animals_html(animals: list[dict]) -> str:
         location = locations[0] if locations else "Unknown"
 
         output += '<li class="cards__item">\n'
-        output += f"Name: {name}<br/>\n"
-        output += f"Diet: {diet}<br/>\n"
-        output += f"Location: {location}<br/>\n"
+        output += f'  <div class="card__title">{name}</div>\n'
+        output += '  <p class="card__text">\n'
+        output += f'      <strong>Diet:</strong> {diet}<br/>\n'
+        output += f'      <strong>Location:</strong> {location}<br/>\n'
         if animal_type is not None:
-            output += f"Type: {animal_type}<br/>\n"
-        output += "</li>\n\n"
+            output += f'      <strong>Type:</strong> {animal_type}<br/>\n'
+        output += '  </p>\n'
+        output += '</li>\n\n'
 
     return output
 
