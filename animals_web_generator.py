@@ -11,51 +11,45 @@ def load_animals():
         return json.load(f)
 
 
-def generate_animal_card(animal: dict) -> str:
-    name = animal.get("name", "Unknown")
-    characteristics = animal.get("characteristics", {})
-    locations = animal.get("locations", [])
+def build_animals_text(animals: list[dict]) -> str:
+    """Build the plain text block exactly like the example."""
+    lines = []
+    for animal in animals:
+        name = animal.get("name", "Unknown")
+        characteristics = animal.get("characteristics", {})
+        locations = animal.get("locations", [])
 
-    diet = characteristics.get("diet", "Unknown")
-    animal_type = characteristics.get("type")  # may be missing
-    location = locations[0] if locations else "Unknown"
+        diet = characteristics.get("diet", "Unknown")
+        animal_type = characteristics.get("type")  # may be missing
+        location = locations[0] if locations else "Unknown"
 
-    # build lines inside the card
-    lines = [
-        f"<p><strong>Name:</strong> {name}</p>",
-        f"<p><strong>Diet:</strong> {diet}</p>",
-        f"<p><strong>Location:</strong> {location}</p>",
-    ]
-    if animal_type is not None:
-        lines.append(f"<p><strong>Type:</strong> {animal_type}</p>")
+        lines.append(f"Name: {name}")
+        lines.append(f"Diet: {diet}")
+        lines.append(f"Location: {location}")
+        if animal_type is not None:
+            lines.append(f"Type: {animal_type}")
+        # empty line between animals
+        lines.append("")
 
-    inner_html = "\n            ".join(lines)
-
-    return f"""
-    <li class="cards__item">
-        <div class="card__text">
-            {inner_html}
-        </div>
-    </li>
-    """.strip()
-
-
-def generate_animals_html(animals: list[dict]) -> str:
-    cards = [generate_animal_card(animal) for animal in animals]
-    return "\n".join(cards)
+    return "\n".join(lines)
 
 
 def main():
     animals = load_animals()
 
+    # 1. Read template
     with TEMPLATE_FILE.open("r", encoding="utf-8") as f:
         template = f.read()
 
-    animals_html = generate_animals_html(animals)
-    output = template.replace("__REPLACE_ANIMALS_INFO__", animals_html)
+    # 2. Generate string with animals’ data
+    animals_text = build_animals_text(animals)
 
+    # 3. Replace placeholder
+    output_html = template.replace("__REPLACE_ANIMALS_INFO__", animals_text)
+
+    # 4. Write to animals.html
     with OUTPUT_FILE.open("w", encoding="utf-8") as f:
-        f.write(output)
+        f.write(output_html)
 
     print(f"Generated {OUTPUT_FILE} with {len(animals)} animals.")
 
