@@ -11,29 +11,33 @@ def load_animals():
         return json.load(f)
 
 
-def build_animals_html(animals: list[dict]) -> str:
-    """Serialize each animal as a styled card <li>."""
+def serialize_animal(animal: dict) -> str:
+    """Return HTML for a single animal card."""
+    name = animal.get("name", "Unknown")
+    characteristics = animal.get("characteristics", {})
+    locations = animal.get("locations", [])
+
+    diet = characteristics.get("diet", "Unknown")
+    animal_type = characteristics.get("type")
+    location = locations[0] if locations else "Unknown"
+
     output = ""
+    output += '<li class="cards__item">\n'
+    output += f'  <div class="card__title">{name}</div>\n'
+    output += '  <p class="card__text">\n'
+    output += f'      <strong>Diet:</strong> {diet}<br/>\n'
+    output += f'      <strong>Location:</strong> {location}<br/>\n'
+    if animal_type is not None:
+        output += f'      <strong>Type:</strong> {animal_type}<br/>\n'
+    output += '  </p>\n'
+    output += '</li>\n\n'
+    return output
 
+
+def build_animals_html(animals: list[dict]) -> str:
+    output = ""
     for animal in animals:
-        name = animal.get("name", "Unknown")
-        characteristics = animal.get("characteristics", {})
-        locations = animal.get("locations", [])
-
-        diet = characteristics.get("diet", "Unknown")
-        animal_type = characteristics.get("type")  # may be missing
-        location = locations[0] if locations else "Unknown"
-
-        output += '<li class="cards__item">\n'
-        output += f'  <div class="card__title">{name}</div>\n'
-        output += '  <p class="card__text">\n'
-        output += f'      <strong>Diet:</strong> {diet}<br/>\n'
-        output += f'      <strong>Location:</strong> {location}<br/>\n'
-        if animal_type is not None:
-            output += f'      <strong>Type:</strong> {animal_type}<br/>\n'
-        output += '  </p>\n'
-        output += '</li>\n\n'
-
+        output += serialize_animal(animal)
     return output
 
 
